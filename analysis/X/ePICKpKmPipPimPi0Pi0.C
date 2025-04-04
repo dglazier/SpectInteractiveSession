@@ -29,7 +29,7 @@ void ePICKpKmPipPimPi0Pi0(){
 
   //create reaction dataframe
   // rad::config::EpicElectro epic{"epic3_tree", "root_files/jpac_x3872_10_100_10day.root"};
-  rad::config::ePICReaction epic{"events","/home/dglazier/EIC/data/sim/jpac_x3872_10_100_halfday_*_recon.root"};
+  rad::config::ePICReaction epic{"events","../../simulated_data/jpac_x3872_10_100_halfday_*_recon.root"};
    epic.SetBeamsFromMC();
 
   epic.AliasColumnsAndMatchWithMC();
@@ -91,7 +91,7 @@ void ePICKpKmPipPimPi0Pi0(){
   ///////////////////////////////////////////////////////////
   // Do some filtering on particle tracks
   ///////////////////////////////////////////////////////////
-  // at least 1 pi+, pi-, e-, e+ and zero photons (remove omega decays)
+  // at least 1 pi+, pi-, K-, K+ and 4 photons (remove omega decays)
   // epic.Filter("(rad::helpers::Count(tru_pid,211)==1)*(rad::helpers::Count(tru_pid,-211)==1)*(rad::helpers::Count(tru_pid,321)==1)*(rad::helpers::Count(tru_pid,-321)==1)*(rad::helpers::Count(tru_pid,22)==4)","reaction_topo");
 
   //force detection of scatted electron

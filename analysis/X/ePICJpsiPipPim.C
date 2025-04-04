@@ -24,7 +24,7 @@ void ePICJpsiPipPim(){
   // Configure the data frame for the reaction
   // ep->e'+ X ( Jpsi(e+e-) + 2Pi (pi+pi-) )
   ///////////////////////////////////////////////////////////
-  rad::config::ePICReaction epic{"events","/home/dglazier/EIC/data/sim/jpac_x3872_10_100_halfday_*_recon.root"};
+  rad::config::ePICReaction epic{"events","../../simulated_data/jpac_x3872_10_100_halfday_*_recon.root"};
   epic.SetBeamsFromMC();
 
   epic.AliasColumnsAndMatchWithMC();
