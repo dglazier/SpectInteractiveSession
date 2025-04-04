@@ -22,6 +22,11 @@ void ePICKpKmPipPimPi0Pi0(){
   
   gBenchmark->Start("df");
 
+  ///////////////////////////////////////////////////////////
+  // Configure the data frame for the reaction
+  // ep->e'+ X ( D0(K-pi+pi0) + D0bar (K+pi-) + pi0 )
+  ///////////////////////////////////////////////////////////
+
   //create reaction dataframe
   // rad::config::EpicElectro epic{"epic3_tree", "root_files/jpac_x3872_10_100_10day.root"};
   rad::config::ePICReaction epic{"events","/home/dglazier/EIC/data/sim/jpac_x3872_10_100_halfday_*_recon.root"};
@@ -67,8 +72,11 @@ void ePICKpKmPipPimPi0Pi0(){
  //Use ParticleCreator to make intermediate states
   epic.Particles().Sum("pi0_1",{"g1","g2"});
   epic.Particles().Sum("pi0_2",{"g3","g4"});
-  // epic.Particles().Sum("D0bar",{"Kp","pim","pi0_1"});
+
+  //can try alternative combination
+  //epic.Particles().Sum("D0bar",{"Kp","pim","pi0_1"});
   //epic.Particles().Sum("D0",{"Km","pip"});
+
   epic.Particles().Sum("D0bar",{"Kp","pim"});
   epic.Particles().Sum("D0",{"Km","pip","pi0_1"});
   
@@ -84,9 +92,21 @@ void ePICKpKmPipPimPi0Pi0(){
   // Do some filtering on particle tracks
   ///////////////////////////////////////////////////////////
   // at least 1 pi+, pi-, e-, e+ and zero photons (remove omega decays)
-  epic.Filter("(rad::helpers::Count(tru_pid,211)==1)*(rad::helpers::Count(tru_pid,-211)==1)*(rad::helpers::Count(tru_pid,321)==1)*(rad::helpers::Count(tru_pid,-321)==1)*(rad::helpers::Count(tru_pid,22)==4)","reaction_topo");
+  // epic.Filter("(rad::helpers::Count(tru_pid,211)==1)*(rad::helpers::Count(tru_pid,-211)==1)*(rad::helpers::Count(tru_pid,321)==1)*(rad::helpers::Count(tru_pid,-321)==1)*(rad::helpers::Count(tru_pid,22)==4)","reaction_topo");
+
+  //force detection of scatted electron
   // epic.Filter("rec_scat_ele>-1","lowQ2");
-  epic.Filter("tru_pid[Kp]==321&&tru_pid[Km]==-321&&tru_pid[pip]==211&&tru_pid[pim]==-211","event_pid");
+
+  // TRUTH : Correct topology
+  // epic.Filter("tru_pid[Kp]==321&&tru_pid[Km]==-321&&tru_pid[pip]==211&&tru_pid[pim]==-211","event_pid");
+
+  //Number of reconstructed photons
+  epic.Filter("rec_Ngamma>2","rec_particles_topo");//rec_pid not reliable, just veto gammas
+
+  //mimimum momentum cut on reconstructed particles
+  epic.Filter("(rec_pmag[Kp]>0.1)*(rec_pmag[Km]>0.1)*(rec_pmag[pip]>0.1)*(rec_pmag[pim]>0.1)","rec_cut");
+  
+ 
   ///////////////////////////////////////////////////////////
   // Declare kinematic calculations you want 
   ///////////////////////////////////////////////////////////
@@ -113,6 +133,19 @@ void ePICKpKmPipPimPi0Pi0(){
   rad::rdf::MissMass(epic,"MissMassP","{scat_ele,p}");
  
   ///////////////////////////////////////////////////////////
+  //Further filtering on calculated variables  
+  ///////////////////////////////////////////////////////////
+  //TRUTH : invariant mass cuts
+  // epic.Filter("tru_MissMass2<0.1","truthMM2");
+  // epic.Filter("tru_D0Mass>1.8&&tru_D0Mass<1.95","truthD0Mass");
+  // epic.Filter("tru_D0barMass>1.8&&tru_D0barMass<1.95","truthD0barMass");
+  // epic.Filter("tru_XMass>3.8&&tru_XMass<3.9","truthXMass");
+
+  //reconstructed invariant mass cuts
+  epic.Filter("rec_D0Mass>1.5","recD0MassCut");
+  epic.Filter("rec_D0barMass>1.75","truthD0MassCut");
+
+  ///////////////////////////////////////////////////////////
   //Define histograms
   ///////////////////////////////////////////////////////////
   rad::histo::Histogrammer histo{"set1",epic};
@@ -125,11 +158,12 @@ void ePICKpKmPipPimPi0Pi0(){
   histo.Init({Truth(),Rec()});//will create histograms for mc
 
   //define histograms
+  histo.Create<TH1D,ulong>({"ngamma","ngamma",20,0,20},{"Ngamma"});
   histo.Create<TH1D,double>({"Q2","Q2",500,0,2.},{"Q2"});
   histo.Create<TH1D,double>({"W","W",100,0,50.},{"W"});
   histo.Create<TH1D,double>({"MesonMass","M(e-,e+, #pi#pi) [GeV]",500,0,5},{"XMass"});
-  histo.Create<TH1D,double>({"D0Mass","M(K-#pi+) [GeV]",100,.3,5.},{"D0Mass"});
-  histo.Create<TH1D,double>({"D0barMass","M(K+#pi-#pi0) [GeV]",100,.3,5.},{"D0barMass"});
+  histo.Create<TH1D,double>({"D0Mass","M(K-#pi+#pi0) [GeV]",100,.3,5.},{"D0Mass"});
+  histo.Create<TH1D,double>({"D0barMass","M(K+#pi-) [GeV]",100,.3,5.},{"D0barMass"});
   histo.Create<TH1D,double>({"Pi0_1Mass","M(2#gamma) [GeV]",100,0,0.5},{"Pi0_1Mass"});
   histo.Create<TH1D,double>({"tb","t(p,p') [GeV^{2}]",100,-2,5},{"tb"});
   histo.Create<TH1D,double>({"tt","t(g,X) [GeV^{2}]",100,-2,5},{"tt"});
@@ -141,10 +175,7 @@ void ePICKpKmPipPimPi0Pi0(){
 
   gBenchmark->Start("processing");
   //save all histograms to file
-  histo.File("histos/EpicKpKmPipPimPi0Pi0_hists.root");
-
-
-
+  histo.File("histos/EpicKpKmPipPimPi0Pi0_hists_rec1.root");
 
   gBenchmark->Stop("processing");
   gBenchmark->Print("processing");

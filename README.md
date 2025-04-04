@@ -1,5 +1,7 @@
 # Interactive Spectroscopy Analysis
 
+https://eic.github.io/tutorial-analysis/index.html
+
 This demonstrates how to analyse spectroscopy reactions using the
 Reaction AWare Dataframes framework. There are options for both
 HepMC generated files and full simulated ePIC data. The code for both
@@ -9,9 +11,16 @@ high-level dataframe.
 # Submodules/Dependencies
 
 ## Reaction Aware (R)Dataframes
+
 https://github.com/dglazier/rad
 
-## Event Generation
+## Setup
+
+      git clone https://github.com/dglazier/SpectInteractiveSession.git
+      cd SpectInteractiveSession
+      export RAD=$PWD/rad/
+      export ROOT_INCLUDE_PATH=$ROOT_INCLUDE_PATH:$RAD/include
+
 
 ## Processing HepMC data
 
