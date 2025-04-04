@@ -16,10 +16,19 @@ https://github.com/dglazier/rad
 
 ## Setup
 
-      git clone https://github.com/dglazier/SpectInteractiveSession.git
+      git clone  --recurse-submodules  https://github.com/dglazier/SpectInteractiveSession.git
       cd SpectInteractiveSession
       export RAD=$PWD/rad/
       export ROOT_INCLUDE_PATH=$ROOT_INCLUDE_PATH:$RAD/include
+
+## Simulated Data
+You may download some Y simulations files from
+
+https://www.dropbox.com/scl/fo/j0skvooeknlyeqglpki4k/AOUcVUcukKw3FTXFSSEs3hc?rlkey=dsww27zy77oxyu0p75y60hvoj&st=b4oodal6&dl=0
+
+You may download some X simulations files from
+
+https://www.dropbox.com/scl/fo/rzdhayjxg7l1auxxaiduk/AGyHXdLUhdkt_kgRmSZOk1M?rlkey=8sy09il6rcwxy7rf73srfvlbw&st=s3e75x1x&dl=0
 
 
 ## Processing HepMC data
